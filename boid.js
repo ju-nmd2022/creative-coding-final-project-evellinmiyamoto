@@ -1,4 +1,4 @@
-export class Boid {
+class Boid {
   constructor() {
     this.position = createVector(random(width), random(height));
     this.velocity = createVector(random(-1, 1), random(-1, 1));
