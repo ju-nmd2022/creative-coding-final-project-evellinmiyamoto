@@ -6,17 +6,21 @@
 // Based on Garrit's class and code of boids https://codepen.io/pixelkind/pen/oNJzppX
 // Based on the the tutorial and code from Daniel Shiffman https://youtu.be/mhjuuHl6qHM
 // Based on Bassima's class and code for the handpose as a starting point
-
-// import { Boid } from "./boid.js";
+// Debug with claude.ai
 
 const flock = [];
 let handpose;
 let video;
 let hands = [];
 
+//got help from Garrit during the lab to flip the camera
 function preload() {
-  handpose = ml5.handPose();
+  handpose = ml5.handPose({
+    flipped: true,
+    maxHands: 1,
+  });
 }
+
 function setup() {
   createCanvas(innerWidth, innerHeight);
 
@@ -56,15 +60,20 @@ function draw() {
     boid.borders();
   }
 
-  //video size (smaller than canvas 30%)
-  let videoWidth = width * 0.3;
-  let videoHeight = (videoWidth / video.width) * video.height;
+  //Debug with claude.ai
+  // //video size (smaller than canvas 30%)
+  // let videoWidth = width * 0.3;
+  // let videoHeight = (videoWidth / video.width) * video.height;
 
-  //position video at the center bottom
-  let videoX = (width - videoWidth) / 2;
-  let videoY = height - videoHeight;
+  // //position video at the center bottom
+  // let videoX = (width - videoWidth) / 2;
+  // let videoY = height - videoHeight;
 
-  image(video, videoX, videoY, videoWidth, videoHeight);
+  // image(video, videoX, videoY, videoWidth, videoHeight);
+  // push();
+  // translate(video.width, 0);
+  // scale(-1, 1);
+  // pop();
 
   if (handCenter) {
     noStroke();
