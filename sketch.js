@@ -20,7 +20,7 @@ function preload() {
 function setup() {
   createCanvas(innerWidth, innerHeight);
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 150; i++) {
     flock.push(new Boid());
   }
   video = createCapture(VIDEO);
@@ -31,38 +31,48 @@ function setup() {
 
 function draw() {
   background(0);
-  //draw autonomous agents
+
+  let handCenter = 0;
+
+  if (hands.length > 0) {
+    let indexFinger = hands[0].index_finger_tip;
+    let thumb = hands[0].thumb_tip;
+
+    let centerX = (indexFinger.x + thumb.x) / 2;
+    let centerY = (indexFinger.y + thumb.y) / 2;
+
+    handCenter = createVector(centerX, centerY);
+  }
+
   for (let boid of flock) {
     boid.flocking(flock);
+
+    if (handCenter) {
+      boid.handInteraction(handCenter);
+    }
+
     boid.update();
     boid.show();
     boid.borders();
   }
 
-  //video size to be smaller than canvas
+  //video size (smaller than canvas 30%)
   let videoWidth = width * 0.3;
   let videoHeight = (videoWidth / video.width) * video.height;
 
-  //video at the center bottom
+  //position video at the center bottom
   let videoX = (width - videoWidth) / 2;
   let videoY = height - videoHeight;
 
   image(video, videoX, videoY, videoWidth, videoHeight);
 
-  for (let hand of hands) {
-    let indexFinger = hand.index_finger_tip;
-    let thumb = hand.thumb_tip;
-
-    let centerX = (indexFinger.x + thumb.x) / 2;
-    let centerY = (indexFinger.y + thumb.y) / 2;
-
-    let distance = dist(indexFinger.x, indexFinger.y, thumb.x, thumb.y);
-
+  if (handCenter) {
     noStroke();
-    fill(0, 0, 255);
-    ellipse(centerX, centerY, distance);
+    fill(204, 153, 255);
+    ellipse(handCenter.x, handCenter.y, 80);
   }
 }
+
 function handsData(results) {
   hands = results;
 }

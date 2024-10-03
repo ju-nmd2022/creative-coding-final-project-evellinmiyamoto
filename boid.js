@@ -12,6 +12,10 @@ class Boid {
     let cohesion = this.cohesion(boids);
     let separation = this.separation(boids);
 
+    alignment.mult(1);
+    cohesion.mult(1);
+    separation.mult(1);
+
     this.acceleration.add(alignment);
     this.acceleration.add(cohesion);
     this.acceleration.add(separation);
@@ -118,5 +122,23 @@ class Boid {
     strokeWeight(5);
     stroke(255);
     point(this.position.x, this.position.y);
+  }
+
+  handInteraction(handPosition) {
+    let handRadius = 150;
+    let d = dist(
+      this.position.x,
+      this.position.y,
+      handPosition.x,
+      handPosition.y
+    );
+
+    if (d < handRadius) {
+      let steer = p5.Vector.sub(handPosition, this.position);
+      steer.setMag(this.maxSpeed);
+      steer.sub(this.velocity);
+      steer.limit(this.maxForce);
+      this.acceleration.add(steer);
+    }
   }
 }
