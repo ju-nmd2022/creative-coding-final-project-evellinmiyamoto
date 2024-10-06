@@ -4,7 +4,7 @@ class Boid {
     this.velocity = createVector(random(-1, 1), random(-1, 1));
     this.acceleration = createVector();
     this.maxForce = 0.2;
-    this.maxSpeed = 7;
+    this.maxSpeed = 5;
     //traits
     this.energy = random(0, 100);
     this.sociability = random(0, 100);
@@ -151,7 +151,7 @@ class Boid {
   }
 
   show() {
-    strokeWeight(5);
+    strokeWeight(7);
     // stroke(255);
     let personalityColor;
     if (this.personality === "friendly") {
@@ -182,7 +182,25 @@ class Boid {
 
     if (d < handRadius) {
       let steer = p5.Vector.sub(handPosition, this.position);
-      steer.setMag(this.maxSpeed);
+      // steer.setMag(this.maxSpeed);
+      // steer.sub(this.velocity);
+      // steer.limit(this.maxForce);
+      // this.acceleration.add(steer);
+      if (this.personality === "friendly") {
+        //friendly boids are strongly attracted to the hand
+        steer.setMag(this.maxSpeed * 1.5);
+      } else if (this.personality === "neutral") {
+        //neutral boids are mildly attracted to the hand
+        steer.setMag(this.maxSpeed);
+      } else if (this.personality === "shy") {
+        //shy boids flee from the hand
+        steer.mult(-1);
+        //Flee a bit faster
+        steer.setMag(this.maxSpeed * 1.5);
+      } else {
+        steer.setMag(this.maxSpeed);
+      }
+
       steer.sub(this.velocity);
       steer.limit(this.maxForce);
       this.acceleration.add(steer);
