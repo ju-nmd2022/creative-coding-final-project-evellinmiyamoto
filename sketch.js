@@ -13,7 +13,7 @@ let handpose;
 let video;
 let hands = [];
 
-//got help from Garrit during the lab to flip the camera
+//got help from Garrit during the lab to flip the camera. based on https://docs.ml5js.org/#/reference/handpose
 function preload() {
   handpose = ml5.handPose({
     flipped: true,
@@ -25,7 +25,7 @@ function setup() {
   createCanvas(innerWidth, innerHeight);
 
   for (let i = 0; i < 150; i++) {
-    flock.push(new Boid());
+    flock.push(new Boid(flock));
   }
   video = createCapture(VIDEO);
   video.size(innerWidth, innerHeight);
@@ -55,7 +55,7 @@ function draw() {
       boid.handInteraction(handCenter);
     }
 
-    boid.update();
+    boid.update(flock);
     boid.show();
     boid.borders();
   }
