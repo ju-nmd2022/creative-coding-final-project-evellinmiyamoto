@@ -23,7 +23,7 @@ function preload() {
 
 function setup() {
   createCanvas(innerWidth, innerHeight);
-
+  // frameRate(30);
   for (let i = 0; i < 150; i++) {
     flock.push(new Boid(flock));
   }
@@ -53,6 +53,9 @@ function draw() {
 
     if (handCenter) {
       boid.handInteraction(handCenter);
+    } else {
+      boid.isInteractingWithHand = false;
+      boid.glowIntensity = 0;
     }
 
     boid.update(flock);
@@ -77,8 +80,13 @@ function draw() {
 
   if (handCenter) {
     noStroke();
-    fill(204, 153, 255);
-    ellipse(handCenter.x, handCenter.y, 80);
+    // fill(204, 153, 255);
+    // ellipse(handCenter.x, handCenter.y, 50);
+    //glow effect https://editor.p5js.org/jesse_harding/sketches/WpONQ8o6u
+    fill(255, 255, 200, 4);
+    for (i = 0; i < 100; i++) {
+      ellipse(handCenter.x, handCenter.y, i * 1.7);
+    }
   }
 }
 

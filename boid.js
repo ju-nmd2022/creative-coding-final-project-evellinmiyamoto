@@ -1,3 +1,13 @@
+// Jönköping University
+// Creative Coding course - 2024
+// Evellin Miyamoto
+// Creative System Project
+
+// Based on Garrit's class and code of boids https://codepen.io/pixelkind/pen/oNJzppX
+// Based on the the tutorial and code from Daniel Shiffman https://youtu.be/mhjuuHl6qHM
+// Based on Bassima's class and code for the handpose as a starting point
+// Debug with claude.ai
+
 class Boid {
   constructor(flock) {
     this.position = createVector(random(width), random(height));
@@ -10,6 +20,8 @@ class Boid {
     this.sociability = random(0, 100);
     //personality based on traits and surrounding
     this.determinePersonality(flock);
+    this.isInteractingWithHand = false;
+    this.glowIntensity = 0;
   }
   //personality based on traits
   determinePersonality(flock) {
@@ -141,7 +153,7 @@ class Boid {
     this.acceleration.mult(0);
 
     //time to time reassess personality
-    if (frameCount % 200 === 0) {
+    if (frameCount % 50 === 0) {
       this.energy += random(-10, 10);
       this.energy = constrain(this.energy, 0, 100);
       this.sociability += random(-5, 5);
@@ -151,7 +163,7 @@ class Boid {
   }
 
   show() {
-    strokeWeight(7);
+    // strokeWeight(7);
     // stroke(255);
     let personalityColor;
     if (this.personality === "friendly") {
@@ -165,8 +177,27 @@ class Boid {
       personalityColor = color(102, 178, 255);
     } else {
       //grey for unexpected personality
-      personalityColor = color(150);
+      personalityColor = color(0, 255, 0);
     }
+
+    //coded the glow with the help of claude ai
+    if (this.isInteractingWithHand) {
+      //glow effect
+      let glowSize = 80;
+      let glowAlpha = this.glowIntensity * 100;
+      noStroke();
+      for (let i = glowSize; i > 0; i -= 2) {
+        let alphaI = map(i, 0, glowSize, glowAlpha, 0);
+        fill(
+          red(personalityColor),
+          green(personalityColor),
+          blue(personalityColor),
+          alphaI
+        );
+        ellipse(this.position.x, this.position.y, i, i);
+      }
+    }
+    strokeWeight(7);
     stroke(personalityColor);
     point(this.position.x, this.position.y);
   }
@@ -181,6 +212,8 @@ class Boid {
     );
 
     if (d < handRadius) {
+      this.isInteractingWithHand = true;
+      this.glowIntensity = map(d, 0, handRadius, 1, 0);
       let steer = p5.Vector.sub(handPosition, this.position);
       // steer.setMag(this.maxSpeed);
       // steer.sub(this.velocity);
@@ -204,6 +237,9 @@ class Boid {
       steer.sub(this.velocity);
       steer.limit(this.maxForce);
       this.acceleration.add(steer);
+    } else {
+      this.isInteractingWithHand = false;
+      this.glowIntensity = 0;
     }
   }
 }
