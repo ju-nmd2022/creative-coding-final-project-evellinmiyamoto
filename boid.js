@@ -24,7 +24,9 @@ class Boid {
     this.glowIntensity = 0;
     //interaction evolution
     this.interactionCount = 0;
-    this.lastInteractionTime = 0;
+    this.lastInteractionFrame = 0;
+    //10 seconds at 60 fps
+    this.reassessmentTime = 600;
   }
 
   //personality based on traits and surrounding
@@ -150,35 +152,41 @@ class Boid {
     }
   }
 
-  update(flock) {
+  update() {
     this.position.add(this.velocity);
     this.velocity.add(this.acceleration);
     this.velocity.limit(this.maxSpeed);
     this.acceleration.mult(0);
 
-    //time to time reassess personality
-    // if (frameCount % 50 === 0) {
-    //   this.energy += random(-10, 10);
-    //   this.energy = constrain(this.energy, 0, 100);
-    //   this.sociability += random(-5, 5);
-    //   this.sociability = constrain(this.sociability, 0, 100);
-    //   this.determinePersonality(flock);
-    // }
+    let timeSinceLastInteraction = frameCount - this.lastInteractionFrame;
 
-    //evolve personality based on interactions
-    this.evolvePersonality();
-    //reset interaction count after 5sec of last interaction
-    if (frameCount - this.lastInteractionTime > 300) {
-      this.interactionCount = 0;
+    //reassess personality if no interaction for some time
+    if (timeSinceLastInteraction > this.reassessmentTime) {
+      this.reassessPersonality(flock);
+    } else {
+      this.evolvePersonality(timeSinceLastInteraction);
     }
   }
 
+  //previously was reassessing the personality time to time on update. Now it is a separate function, to happen based on no interaction
+  reassessPersonality(flock) {
+    this.energy = random(0, 100);
+    this.sociability = random(0, 100);
+
+    //determine new personality based on traits and surroundings
+    this.determinePersonality(flock);
+
+    //reset interaction properties
+    this.interactionCount = 0;
+    this.lastInteractionFrame = frameCount;
+  }
+
   evolvePersonality() {
-    if (this.personality === "shy" && this.interactionCount >= 2) {
+    if (this.personality === "shy" && this.interactionCount >= 5) {
       this.personality = "neutral";
       this.sociability += 20;
       this.interactionCount = 0;
-    } else if (this.personality === "neutral" && this.interactionCount >= 4) {
+    } else if (this.personality === "neutral" && this.interactionCount >= 8) {
       this.personality = "friendly";
       this.sociability += 20;
       this.interactionCount = 0;
@@ -236,19 +244,16 @@ class Boid {
     );
 
     if (d < handRadius) {
-      if (!this.isInteractingWithHand) {
-        //incrementar se ele NÃO estiver interagindo no frame anterior
-        this.interactionCount++;
-      }
       this.isInteractingWithHand = true;
       this.glowIntensity = map(d, 0, handRadius, 1, 0);
-      this.lastInteractionTime = frameCount;
+
+      //only count as a new interaction if it's been at least 60 frames since the last one otherwise it was counting the interactions too fast
+      if (frameCount - this.lastInteractionFrame >= 60) {
+        this.interactionCount++;
+        this.lastInteractionFrame = frameCount;
+      }
 
       let steer = p5.Vector.sub(handPosition, this.position);
-      // steer.setMag(this.maxSpeed);
-      // steer.sub(this.velocity);
-      // steer.limit(this.maxForce);
-      // this.acceleration.add(steer);
       if (this.personality === "friendly") {
         //friendly boids are strongly attracted to the hand
         steer.setMag(this.maxSpeed * 1.5);
