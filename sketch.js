@@ -63,25 +63,8 @@ function draw() {
     boid.borders();
   }
 
-  //Debug with claude.ai
-  // //video size (smaller than canvas 30%)
-  // let videoWidth = width * 0.3;
-  // let videoHeight = (videoWidth / video.width) * video.height;
-
-  // //position video at the center bottom
-  // let videoX = (width - videoWidth) / 2;
-  // let videoY = height - videoHeight;
-
-  // image(video, videoX, videoY, videoWidth, videoHeight);
-  // push();
-  // translate(video.width, 0);
-  // scale(-1, 1);
-  // pop();
-
   if (handCenter) {
     noStroke();
-    // fill(204, 153, 255);
-    // ellipse(handCenter.x, handCenter.y, 50);
     //glow effect https://editor.p5js.org/jesse_harding/sketches/WpONQ8o6u
     fill(255, 255, 200, 4);
     for (i = 0; i < 100; i++) {
